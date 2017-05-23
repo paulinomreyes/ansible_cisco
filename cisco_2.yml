@@ -1,0 +1,27 @@
+# Playbook to configure interface description
+---
+- hosts: ios
+  gather_facts: no
+  connection: local
+
+  tasks:
+  - name: Obtain Login Credentials
+    include_vars: auth.yaml
+
+  - name: Define Provider
+    set_fact:
+      provider:
+        host: "{{ inventory_hostname }}"
+        username: "{{ creds['username'] }}"
+        password: "{{ creds['password'] }}"
+        auth_pass: "{{ creds['auth_pass'] }}"
+
+  - name: Configure Interface Description
+    ios_config:
+      provider: "{{ provider }}"
+      lines:
+        - description DONOT-MON
+      parents: interface range GigabitEthernet0/1-10
+
+
+   

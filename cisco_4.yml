@@ -1,0 +1,32 @@
+# Playbook example for pass arguments from cli
+# ansible-playbook cisco_4.yml --extra-vars "cmd='sh conf'"
+---
+- hosts: ios
+  gather_facts: no
+  connection: local
+
+  tasks:
+  - name: Obtain Login Credentials
+    include_vars: auth.yaml
+
+  - name: Define Provider
+    set_fact:
+      provider:
+        host: "{{ inventory_hostname }}"
+        username: "{{ creds['username'] }}"
+        password: "{{ creds['password'] }}"
+        auth_pass: "{{ creds['auth_pass'] }}"
+
+  - name: Get Timestamp
+    command: date +%Y%m%d
+    register: timestamp
+
+  - name: Show Configuration 
+    ios_command:
+      provider: "{{ provider }}"
+      commands: '{{ cmd }}' 
+    register: config
+
+  - copy:
+      content: "{{ config.stdout[0] }}"
+      dest: "/tmp/{{ inventory_hostname }}_running-config_{{ timestamp.stdout }}"

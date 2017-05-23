@@ -1,0 +1,3 @@
+provider:
+ host:"{{ansible_host}}"
+ transport:cli

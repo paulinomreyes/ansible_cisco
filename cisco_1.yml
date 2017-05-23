@@ -1,0 +1,28 @@
+# Playbook to fetch Device configuration
+---
+- hosts: ios
+  gather_facts: no
+  connection: local
+
+  tasks:
+  - name: Obtain Login Credentials
+    include_vars: auth.yaml
+
+  - name: Define Provider
+    set_fact:
+      provider:
+        host: "{{ inventory_hostname }}"
+        username: "{{ creds['username'] }}"
+        password: "{{ creds['password'] }}"
+        auth_pass: "{{ creds['auth_pass'] }}"
+
+  - name: Run 'Show Configuration'
+    ios_command:
+      provider: "{{ provider }}"
+      commands:
+        - show conf
+    register: show_conf
+
+  - debug: var=show_conf.stdout_lines
+
+   
